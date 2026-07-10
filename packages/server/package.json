@@ -1,6 +1,6 @@
 {
   "name": "@ai2web/server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AI2Web server - framework-agnostic /ai2w route handler + adapters (Node http, Express, Hono, Next).",
   "license": "MIT",
   "repository": {
@@ -16,7 +16,7 @@
   "files": ["dist"],
   "publishConfig": { "access": "public" },
   "dependencies": {
-    "@ai2web/core": "0.1.0"
+    "@ai2web/core": "0.1.1"
   },
   "scripts": {
     "build": "tsc --build"

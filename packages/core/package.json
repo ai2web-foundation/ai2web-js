@@ -1,6 +1,6 @@
 {
   "name": "@ai2web/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AI2Web (ai2w) core - types, capability model, manifest builder, validation & AI Readiness scoring.",
   "license": "MIT",
   "repository": {

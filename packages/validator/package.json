@@ -1,6 +1,6 @@
 {
   "name": "@ai2web/validator",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AI2Web validator - `ai2web validate <url>` → per-capability report + AI Readiness Score.",
   "license": "MIT",
   "repository": {
@@ -17,7 +17,7 @@
   "files": ["dist"],
   "publishConfig": { "access": "public" },
   "dependencies": {
-    "@ai2web/core": "0.1.0"
+    "@ai2web/core": "0.1.1"
   },
   "scripts": {
     "build": "tsc --build"

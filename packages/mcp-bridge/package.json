@@ -1,6 +1,7 @@
 {
   "name": "@ai2web/mcp-bridge",
   "version": "0.1.1",
+  "keywords": ["ai2web","mcp","model-context-protocol","ai-agents","claude","chatgpt","tools","agentic"],
   "description": "Expose an AI2Web site's declared capabilities as an MCP server - usable in Claude/ChatGPT today.",
   "license": "MIT",
   "repository": {

@@ -1,6 +1,7 @@
 {
   "name": "@ai2web/connector",
   "version": "0.1.1",
+  "keywords": ["ai2web","mcp","connector","ai-agents","claude","chatgpt","discovery","agentic"],
   "description": "Agent-side AI2Web connector - an MCP server that fronts the Discovery Network so Claude/ChatGPT can find AI-ready sites and act on them.",
   "license": "MIT",
   "repository": {

@@ -1,6 +1,7 @@
 {
   "name": "@ai2web/react",
   "version": "0.1.1",
+  "keywords": ["ai2web","react","react-hooks","ai","ai-agents","badge","ai-readiness","component"],
   "description": "React bindings for AI2Web: useDiscover / useValidate / useNegotiate hooks and an embeddable AI Readiness <Ai2wBadge>.",
   "license": "MIT",
   "repository": {

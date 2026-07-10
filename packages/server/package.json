@@ -1,6 +1,7 @@
 {
   "name": "@ai2web/server",
   "version": "0.1.1",
+  "keywords": ["ai2web","ai","ai-agents","agentic","mcp","server","cloudflare-workers","nodejs","api","manifest"],
   "description": "AI2Web server - framework-agnostic /ai2w route handler + adapters (Node http, Express, Hono, Next).",
   "license": "MIT",
   "repository": {

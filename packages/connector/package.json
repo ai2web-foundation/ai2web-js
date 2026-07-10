@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "description": "Agent-side AI2Web connector - an MCP server that fronts the Discovery Network so Claude/ChatGPT can find AI-ready sites and act on them.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai2web-foundation/ai2web-js.git",
+    "directory": "packages/connector"
+  },
+  "homepage": "https://ai2web.dev",
+  "bugs": "https://github.com/ai2web-foundation/ai2web-js/issues",
   "type": "module",
   "bin": {
     "ai2web-connector": "./dist/server.js"

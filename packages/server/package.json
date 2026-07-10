@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "description": "AI2Web server - framework-agnostic /ai2w route handler + adapters (Node http, Express, Hono, Next).",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai2web-foundation/ai2web-js.git",
+    "directory": "packages/server"
+  },
+  "homepage": "https://ai2web.dev",
+  "bugs": "https://github.com/ai2web-foundation/ai2web-js/issues",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

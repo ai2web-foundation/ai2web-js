@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "description": "Describe an AI2Web site's declared actions as an OpenAPI 3.1 document, preserving auth and risk/approval semantics.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai2web-foundation/ai2web-js.git",
+    "directory": "packages/openapi-adapter"
+  },
+  "homepage": "https://ai2web.dev",
+  "bugs": "https://github.com/ai2web-foundation/ai2web-js/issues",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

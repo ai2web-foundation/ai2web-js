@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "description": "Expose an AI2Web site's declared capabilities as a GraphQL schema, with RFC-0006 §3 approval/credential/SSRF enforcement.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai2web-foundation/ai2web-js.git",
+    "directory": "packages/graphql-adapter"
+  },
+  "homepage": "https://ai2web.dev",
+  "bugs": "https://github.com/ai2web-foundation/ai2web-js/issues",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

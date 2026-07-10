@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "description": "Drive an AI2Web site's advertised ACP checkout transport (RFC-0005 Profile 1) with approval-gated payment.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai2web-foundation/ai2web-js.git",
+    "directory": "packages/acp-adapter"
+  },
+  "homepage": "https://ai2web.dev",
+  "bugs": "https://github.com/ai2web-foundation/ai2web-js/issues",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

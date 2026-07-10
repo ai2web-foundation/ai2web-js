@@ -1,0 +1,84 @@
+{
+  "protocol": "ai2w",
+  "version": "0.1",
+  "site": {
+    "name": "Acme Analytics",
+    "url": "https://acme.example.io",
+    "type": "saas",
+    "description": "Product analytics platform for web and mobile teams.",
+    "jurisdiction": "US",
+    "languages": ["en-US"]
+  },
+  "identity": {
+    "legal_name": "Acme Analytics Inc.",
+    "privacy_policy": "https://acme.example.io/privacy",
+    "terms": "https://acme.example.io/terms",
+    "support_url": "https://acme.example.io/help"
+  },
+  "capabilities": {
+    "content": { "enabled": true, "endpoint": "/ai2w/content" },
+    "search": { "enabled": true, "endpoint": "/ai2w/search" },
+    "actions": { "enabled": true, "endpoint": "/ai2w/actions" },
+    "events": { "enabled": true, "endpoint": "/ai2w/events" },
+    "commerce": false
+  },
+  "transports": {
+    "rest": { "enabled": true, "base": "/ai2w" },
+    "mcp": { "enabled": true, "endpoint": "/ai2w/mcp" },
+    "openapi": { "enabled": true, "url": "https://acme.example.io/openapi.json" }
+  },
+  "auth": {
+    "methods": ["oauth2"],
+    "oauth2": {
+      "authorization_url": "https://acme.example.io/oauth/authorize",
+      "token_url": "https://acme.example.io/oauth/token",
+      "pkce": true,
+      "scopes": ["read_docs", "read_reports", "manage_billing", "create_ticket"]
+    }
+  },
+  "consent": {
+    "requires_user_approval_for": ["billing_change", "account_change", "data_export"]
+  },
+  "actions": [
+    {
+      "name": "search_docs",
+      "description": "Search product documentation and guides.",
+      "method": "POST",
+      "endpoint": "/ai2w/actions/search-docs",
+      "requires_auth": false,
+      "requires_user_approval": false,
+      "risk": "low",
+      "input_schema": {
+        "type": "object",
+        "properties": { "query": { "type": "string" } },
+        "required": ["query"]
+      }
+    },
+    {
+      "name": "create_ticket",
+      "description": "Open a support ticket on behalf of the authenticated user.",
+      "method": "POST",
+      "endpoint": "/ai2w/actions/create-ticket",
+      "requires_auth": true,
+      "requires_user_approval": true,
+      "risk": "medium",
+      "input_schema": {
+        "type": "object",
+        "properties": { "subject": { "type": "string" }, "body": { "type": "string" } },
+        "required": ["subject", "body"]
+      }
+    }
+  ],
+  "events": {
+    "endpoint": "/ai2w/events",
+    "subscribe": "/ai2w/events/subscribe",
+    "delivery": ["webhook", "poll"],
+    "types": ["support_ticket.updated", "report.ready", "new_article.published", "incident.opened", "incident.resolved"]
+  },
+  "agent_service": {
+    "enabled": true,
+    "endpoint": "/ai2w/agent",
+    "supported_intents": ["answer_question", "check_billing", "create_ticket", "handoff_to_human"]
+  },
+  "contact": { "support": "help@acme.example.io", "security": "security@acme.example.io" }
+}

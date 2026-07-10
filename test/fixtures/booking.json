@@ -1,0 +1,86 @@
+{
+  "protocol": "ai2w",
+  "version": "0.1",
+  "site": {
+    "name": "Riverside Dental",
+    "url": "https://riverside.example.co.uk",
+    "type": "booking",
+    "description": "Dental practice offering check-ups, hygiene and cosmetic treatments.",
+    "jurisdiction": "GB",
+    "languages": ["en-GB"]
+  },
+  "identity": {
+    "legal_name": "Riverside Dental Practice Ltd",
+    "privacy_policy": "https://riverside.example.co.uk/privacy",
+    "terms": "https://riverside.example.co.uk/terms"
+  },
+  "capabilities": {
+    "content": { "enabled": true, "endpoint": "/ai2w/content" },
+    "booking": { "enabled": true, "endpoint": "/ai2w/actions", "availability": true },
+    "actions": { "enabled": true, "endpoint": "/ai2w/actions" },
+    "events": { "enabled": true, "endpoint": "/ai2w/events" },
+    "commerce": false
+  },
+  "transports": {
+    "rest": { "enabled": true, "base": "/ai2w" },
+    "mcp": { "enabled": true, "endpoint": "/ai2w/mcp" }
+  },
+  "auth": {
+    "methods": ["none", "oauth2"],
+    "oauth2": {
+      "authorization_url": "https://riverside.example.co.uk/oauth/authorize",
+      "token_url": "https://riverside.example.co.uk/oauth/token",
+      "pkce": true,
+      "scopes": ["read_availability", "manage_appointments"]
+    }
+  },
+  "consent": {
+    "requires_user_approval_for": ["booking_confirmation", "account_change", "data_export"]
+  },
+  "actions": [
+    {
+      "name": "check_availability",
+      "description": "List available appointment slots for a treatment and date range.",
+      "method": "POST",
+      "endpoint": "/ai2w/actions/check-availability",
+      "requires_auth": false,
+      "requires_user_approval": false,
+      "risk": "low",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "treatment": { "type": "string" },
+          "from": { "type": "string", "format": "date" },
+          "to": { "type": "string", "format": "date" }
+        },
+        "required": ["treatment"]
+      }
+    },
+    {
+      "name": "book_slot",
+      "description": "Book an appointment slot for the authenticated patient.",
+      "method": "POST",
+      "endpoint": "/ai2w/actions/book-slot",
+      "requires_auth": true,
+      "requires_user_approval": true,
+      "risk": "high",
+      "input_schema": {
+        "type": "object",
+        "properties": { "slot_id": { "type": "string" }, "treatment": { "type": "string" } },
+        "required": ["slot_id"]
+      }
+    }
+  ],
+  "events": {
+    "endpoint": "/ai2w/events",
+    "subscribe": "/ai2w/events/subscribe",
+    "delivery": ["webhook", "poll"],
+    "types": ["booking.confirmed", "booking.changed", "booking.reminder", "booking.cancelled"]
+  },
+  "agent_service": {
+    "enabled": true,
+    "endpoint": "/ai2w/agent",
+    "supported_intents": ["check_availability", "book_slot", "reschedule", "handoff_to_human"]
+  },
+  "contact": { "support": "reception@riverside.example.co.uk" }
+}

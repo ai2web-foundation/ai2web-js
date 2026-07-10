@@ -1,0 +1,23 @@
+{
+  "name": "@ai2web/mcp-bridge",
+  "version": "0.1.0",
+  "description": "Expose an AI2Web site's declared capabilities as an MCP server - usable in Claude/ChatGPT today.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "publishConfig": { "access": "public" },
+  "dependencies": {
+    "@ai2web/core": "0.1.0"
+  },
+  "peerDependencies": {
+    "@modelcontextprotocol/sdk": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@modelcontextprotocol/sdk": { "optional": true }
+  },
+  "scripts": {
+    "build": "tsc --build"
+  }
+}

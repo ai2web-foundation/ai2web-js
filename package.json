@@ -1,0 +1,20 @@
+{
+  "name": "ai2web",
+  "private": true,
+  "description": "AI2Web (ai2w) reference framework - core, validator, adapters.",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "validate:examples": "node scripts/validate.mjs ../ai2web-spec/examples/ecommerce.json"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.6.3"
+  }
+}

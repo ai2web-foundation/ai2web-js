@@ -1,0 +1,14 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/core" },
+    { "path": "packages/validator" },
+    { "path": "packages/server" },
+    { "path": "packages/mcp-bridge" },
+    { "path": "packages/graphql-adapter" },
+    { "path": "packages/acp-adapter" },
+    { "path": "packages/openapi-adapter" },
+    { "path": "packages/react" },
+    { "path": "packages/connector" }
+  ]
+}

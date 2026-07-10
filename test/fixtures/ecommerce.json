@@ -1,0 +1,179 @@
+{
+  "protocol": "ai2w",
+  "version": "0.1",
+  "site": {
+    "name": "Example Store",
+    "url": "https://store.example.com",
+    "type": "ecommerce",
+    "description": "Online retailer for footwear and clothing.",
+    "jurisdiction": "GB",
+    "languages": ["en-GB"]
+  },
+  "identity": {
+    "legal_name": "Example Store Ltd",
+    "privacy_policy": "https://store.example.com/privacy",
+    "terms": "https://store.example.com/terms",
+    "support_url": "https://store.example.com/support"
+  },
+  "capabilities": {
+    "content": { "enabled": true, "endpoint": "/ai2w/content" },
+    "commerce": { "enabled": true, "endpoint": "/ai2w/products", "checkout": true, "returns": true },
+    "support": {
+      "enabled": true,
+      "endpoint": "/ai2w/support",
+      "order_tracking": true,
+      "returns": true,
+      "refunds": true,
+      "cancellation": true,
+      "issue_report": true,
+      "human_handoff": true
+    },
+    "search": { "enabled": true, "endpoint": "/ai2w/search" },
+    "actions": { "enabled": true, "endpoint": "/ai2w/actions" },
+    "events": { "enabled": true, "endpoint": "/ai2w/events" },
+    "booking": false
+  },
+  "transports": {
+    "rest": { "enabled": true, "base": "/ai2w" },
+    "mcp": { "enabled": true, "endpoint": "/ai2w/mcp" },
+    "acp": { "enabled": true, "endpoint": "/ai2w/acp" },
+    "feeds": { "product_feed": "/ai2w/products.json" },
+    "webmcp": { "enabled": false }
+  },
+  "auth": {
+    "methods": ["none", "oauth2"],
+    "oauth2": {
+      "authorization_url": "https://store.example.com/oauth/authorize",
+      "token_url": "https://store.example.com/oauth/token",
+      "pkce": true,
+      "scopes": ["read_products", "read_orders", "track_delivery", "create_cart", "checkout", "manage_returns"]
+    }
+  },
+  "consent": {
+    "requires_user_approval_for": ["purchase", "payment", "refund", "return", "cancellation", "account_change", "data_export"]
+  },
+  "actions": [
+    {
+      "id": "check_stock",
+      "name": "check_stock",
+      "display_name": "Check stock",
+      "description": "Check product availability by SKU, size and colour.",
+      "method": "POST",
+      "endpoint": "/ai2w/actions/check-stock",
+      "requires_auth": false,
+      "requires_user_approval": false,
+      "risk": "low",
+      "input_schema": {
+        "type": "object",
+        "properties": { "sku": { "type": "string" }, "size": { "type": "string" }, "colour": { "type": "string" } },
+        "required": ["sku"]
+      }
+    },
+    {
+      "id": "track_order",
+      "name": "track_order",
+      "display_name": "Track order",
+      "description": "Track the delivery status of an order.",
+      "method": "POST",
+      "endpoint": "/ai2w/actions/track-order",
+      "requires_auth": true,
+      "requires_user_approval": false,
+      "risk": "medium",
+      "input_schema": {
+        "type": "object",
+        "properties": { "order_id": { "type": "string" } },
+        "required": ["order_id"]
+      }
+    },
+    {
+      "id": "report_issue",
+      "name": "report_issue",
+      "display_name": "Report an issue",
+      "description": "Report a problem with an order (e.g. a damaged item), with optional photo evidence.",
+      "method": "POST",
+      "endpoint": "/ai2w/actions/report-issue",
+      "requires_auth": true,
+      "requires_user_approval": false,
+      "risk": "low",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "order_id": { "type": "string" },
+          "description": { "type": "string" },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": { "type": { "type": "string", "enum": ["image", "text"] }, "url": { "type": "string" } }
+            }
+          }
+        },
+        "required": ["order_id", "description"]
+      }
+    },
+    {
+      "id": "start_return",
+      "name": "start_return",
+      "display_name": "Start a return",
+      "description": "Initiate a return for one or more items and receive a return label / RMA.",
+      "method": "POST",
+      "endpoint": "/ai2w/actions/start-return",
+      "requires_auth": true,
+      "requires_user_approval": true,
+      "risk": "medium",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "order_id": { "type": "string" },
+          "item_sku": { "type": "string" },
+          "reason": { "type": "string" }
+        },
+        "required": ["order_id", "reason"]
+      }
+    },
+    {
+      "id": "request_refund",
+      "name": "request_refund",
+      "display_name": "Request a refund",
+      "description": "Request a refund for an order or a returned item. Requires explicit approval.",
+      "method": "POST",
+      "endpoint": "/ai2w/actions/request-refund",
+      "requires_auth": true,
+      "requires_user_approval": true,
+      "risk": "high",
+      "input_schema": {
+        "type": "object",
+        "properties": { "order_id": { "type": "string" }, "reason": { "type": "string" } },
+        "required": ["order_id"]
+      }
+    },
+    {
+      "id": "check_return_status",
+      "name": "check_return_status",
+      "display_name": "Check return status",
+      "description": "Check the status of an existing return or refund.",
+      "method": "POST",
+      "endpoint": "/ai2w/actions/check-return-status",
+      "requires_auth": true,
+      "requires_user_approval": false,
+      "risk": "low",
+      "input_schema": {
+        "type": "object",
+        "properties": { "order_id": { "type": "string" }, "return_id": { "type": "string" } },
+        "required": ["order_id"]
+      }
+    }
+  ],
+  "events": {
+    "endpoint": "/ai2w/events",
+    "subscribe": "/ai2w/events/subscribe",
+    "delivery": ["webhook", "poll"],
+    "types": ["order.created", "order.shipped", "order.delivered", "return.requested", "return.approved", "refund.processed", "product.back_in_stock", "price.drop"]
+  },
+  "agent_service": {
+    "enabled": true,
+    "endpoint": "/ai2w/agent",
+    "supported_intents": ["product_question", "check_stock", "track_order", "report_issue", "start_return", "request_refund", "raise_ticket", "handoff_to_human"]
+  },
+  "contact": { "support": "support@store.example.com", "security": "security@store.example.com" }
+}

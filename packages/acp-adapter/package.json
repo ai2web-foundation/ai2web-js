@@ -1,0 +1,17 @@
+{
+  "name": "@ai2web/acp-adapter",
+  "version": "0.1.0",
+  "description": "Drive an AI2Web site's advertised ACP checkout transport (RFC-0005 Profile 1) with approval-gated payment.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "publishConfig": { "access": "public" },
+  "dependencies": {
+    "@ai2web/core": "0.1.0"
+  },
+  "scripts": {
+    "build": "tsc --build"
+  }
+}

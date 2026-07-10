@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI2Web - vanilla JS example</title>
+</head>
+<body>
+  <h1>Vanilla JavaScript</h1>
+
+  <!-- 1. A drop-in web component: no framework, no build step. -->
+  <p>Embeddable badge (web component):</p>
+  <ai2w-badge url="https://ai2web.dev"></ai2w-badge>
+  <script type="module" src="./ai2w-badge.js"></script>
+
+  <!-- 2. Or call the core API directly from a module script. -->
+  <p>Discover + score inline:</p>
+  <pre id="out">...</pre>
+  <script type="module">
+    import { discover, validateManifest } from "https://esm.sh/@ai2web/core";
+    try {
+      const { manifest } = await discover("https://ai2web.dev");
+      const r = validateManifest(manifest);
+      document.getElementById("out").textContent =
+        `${manifest.site.name}: ${r.score}/100 (${r.tier})`;
+    } catch (e) {
+      document.getElementById("out").textContent = "unavailable: " + e.message;
+    }
+  </script>
+</body>
+</html>

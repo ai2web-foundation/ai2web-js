@@ -1,0 +1,17 @@
+{
+  "name": "@ai2web/core",
+  "version": "0.1.0",
+  "description": "AI2Web (ai2w) core - types, capability model, manifest builder, validation & AI Readiness scoring.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+  },
+  "files": ["dist"],
+  "publishConfig": { "access": "public" },
+  "scripts": {
+    "build": "tsc --build"
+  }
+}

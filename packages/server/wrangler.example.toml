@@ -1,0 +1,17 @@
+# Example Cloudflare Workers config for serving AI2Web.
+#   npm i -g wrangler
+#   wrangler dev --config wrangler.example.toml       # local
+#   wrangler deploy --config wrangler.example.toml    # deploy
+#
+# Serves /ai2w, /.well-known/ai2w, /ai2w/negotiate and /ai2w/* on your Worker.
+
+name = "ai2web-site"
+main = "examples/worker.ts"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# For the Discovery Network, back it with D1 (SQLite) or KV instead of in-memory:
+# [[d1_databases]]
+# binding = "DIRECTORY"
+# database_name = "ai2web-directory"
+# database_id = "<your-d1-id>"

@@ -1,0 +1,24 @@
+{
+  "name": "@ai2web/react",
+  "version": "0.1.0",
+  "description": "React bindings for AI2Web: useDiscover / useValidate / useNegotiate hooks and an embeddable AI Readiness <Ai2wBadge>.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "publishConfig": { "access": "public" },
+  "dependencies": {
+    "@ai2web/core": "0.1.0"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "react": "^18.3.1",
+    "@types/react": "^18.3.0"
+  },
+  "scripts": {
+    "build": "tsc --build"
+  }
+}

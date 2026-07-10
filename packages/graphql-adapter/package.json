@@ -1,0 +1,23 @@
+{
+  "name": "@ai2web/graphql-adapter",
+  "version": "0.1.0",
+  "description": "Expose an AI2Web site's declared capabilities as a GraphQL schema, with RFC-0006 §3 approval/credential/SSRF enforcement.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "publishConfig": { "access": "public" },
+  "dependencies": {
+    "@ai2web/core": "0.1.0"
+  },
+  "peerDependencies": {
+    "graphql": ">=16"
+  },
+  "peerDependenciesMeta": {
+    "graphql": { "optional": true }
+  },
+  "scripts": {
+    "build": "tsc --build"
+  }
+}

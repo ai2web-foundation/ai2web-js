@@ -1,0 +1,64 @@
+{
+  "protocol": "ai2w",
+  "version": "0.1",
+  "site": {
+    "name": "The Daily Signal",
+    "url": "https://signal.example.news",
+    "type": "publisher",
+    "description": "Independent technology news and long-form analysis.",
+    "jurisdiction": "GB",
+    "languages": ["en-GB"]
+  },
+  "identity": {
+    "legal_name": "Signal Media Ltd",
+    "privacy_policy": "https://signal.example.news/privacy",
+    "terms": "https://signal.example.news/terms"
+  },
+  "capabilities": {
+    "content": { "enabled": true, "endpoint": "/ai2w/content", "articles": true, "archive": true },
+    "search": { "enabled": true, "endpoint": "/ai2w/search" },
+    "events": { "enabled": true, "endpoint": "/ai2w/events" },
+    "actions": { "enabled": true, "endpoint": "/ai2w/actions" },
+    "commerce": false
+  },
+  "transports": {
+    "rest": { "enabled": true, "base": "/ai2w" },
+    "mcp": { "enabled": true, "endpoint": "/ai2w/mcp" },
+    "feeds": { "json_feed": "/ai2w/feed.json", "rss": "/feed.xml" }
+  },
+  "auth": {
+    "methods": ["none", "oauth2"],
+    "oauth2": {
+      "authorization_url": "https://signal.example.news/oauth/authorize",
+      "token_url": "https://signal.example.news/oauth/token",
+      "pkce": true,
+      "scopes": ["read_premium", "manage_subscription"]
+    }
+  },
+  "consent": {
+    "requires_user_approval_for": ["subscription_change", "data_export"]
+  },
+  "actions": [
+    {
+      "name": "search_articles",
+      "description": "Search published articles by topic, author or date.",
+      "method": "POST",
+      "endpoint": "/ai2w/actions/search-articles",
+      "requires_auth": false,
+      "requires_user_approval": false,
+      "risk": "low",
+      "input_schema": {
+        "type": "object",
+        "properties": { "query": { "type": "string" }, "topic": { "type": "string" } },
+        "required": ["query"]
+      }
+    }
+  ],
+  "events": {
+    "endpoint": "/ai2w/events",
+    "subscribe": "/ai2w/events/subscribe",
+    "delivery": ["webhook", "poll"],
+    "types": ["new_article.published", "topic.updated", "correction.issued"]
+  },
+  "contact": { "support": "hello@signal.example.news" }
+}

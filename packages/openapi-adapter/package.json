@@ -1,0 +1,17 @@
+{
+  "name": "@ai2web/openapi-adapter",
+  "version": "0.1.0",
+  "description": "Describe an AI2Web site's declared actions as an OpenAPI 3.1 document, preserving auth and risk/approval semantics.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "publishConfig": { "access": "public" },
+  "dependencies": {
+    "@ai2web/core": "0.1.0"
+  },
+  "scripts": {
+    "build": "tsc --build"
+  }
+}

@@ -1,0 +1,31 @@
+name: Publish to npm
+
+# Publishes every @ai2web/* package to npm. Triggered when you publish a GitHub Release,
+# or manually from the Actions tab (Run workflow). Requires an NPM_TOKEN repo secret
+# (an npm "Automation" token, which bypasses the interactive 2FA prompt).
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # enables npm provenance (public packages, public repo)
+
+jobs:
+  publish:
+    name: Build & publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm run build
+      # Publishes all non-private workspaces. Each package.json already sets
+      # publishConfig.access = public, so scoped packages publish publicly.
+      - run: npm publish --workspaces --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

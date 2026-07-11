@@ -1,0 +1,21 @@
+# Smithery configuration for the AI2Web MCP connector.
+# https://smithery.ai/docs
+# Note: Smithery's schema evolves; verify against current docs before publishing. For a
+# monorepo, Smithery may expect this file at the repo root or a configured base directory.
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required: []
+    properties:
+      directoryUrl:
+        type: string
+        title: Discovery Network URL
+        description: URL of the AI2Web Discovery Network the connector queries.
+        default: https://directory.ai2web.dev
+  commandFunction: |-
+    (config) => ({
+      command: 'npx',
+      args: ['-y', '@ai2web/connector'],
+      env: { AI2WEB_DIRECTORY: config.directoryUrl || 'https://directory.ai2web.dev' }
+    })

@@ -1,6 +1,6 @@
 {
   "name": "@ai2web/server",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "keywords": ["ai2web","ai","ai-agents","agentic","mcp","server","cloudflare-workers","nodejs","api","manifest"],
   "description": "AI2Web server - framework-agnostic /ai2w route handler + adapters (Node http, Express, Hono, Next).",
   "license": "MIT",
@@ -17,7 +17,7 @@
   "files": ["dist"],
   "publishConfig": { "access": "public" },
   "dependencies": {
-    "@ai2web/core": "0.1.1"
+    "@ai2web/core": "0.1.2"
   },
   "scripts": {
     "build": "tsc --build"

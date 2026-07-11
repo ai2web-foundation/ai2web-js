@@ -1,6 +1,6 @@
 {
   "name": "@ai2web/graphql-adapter",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "keywords": ["ai2web","graphql","ai-agents","mcp","adapter","schema","agentic"],
   "description": "Expose an AI2Web site's declared capabilities as a GraphQL schema, with RFC-0006 §3 approval/credential/SSRF enforcement.",
   "license": "MIT",
@@ -17,7 +17,7 @@
   "files": ["dist"],
   "publishConfig": { "access": "public" },
   "dependencies": {
-    "@ai2web/core": "0.1.1"
+    "@ai2web/core": "0.1.2"
   },
   "peerDependencies": {
     "graphql": ">=16"

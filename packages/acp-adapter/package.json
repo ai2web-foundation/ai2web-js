@@ -1,6 +1,6 @@
 {
   "name": "@ai2web/acp-adapter",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "keywords": ["ai2web","acp","agentic-commerce","checkout","commerce","ai-agents","payments"],
   "description": "Drive an AI2Web site's advertised ACP checkout transport (RFC-0005 Profile 1) with approval-gated payment.",
   "license": "MIT",
@@ -17,7 +17,7 @@
   "files": ["dist"],
   "publishConfig": { "access": "public" },
   "dependencies": {
-    "@ai2web/core": "0.1.1"
+    "@ai2web/core": "0.1.2"
   },
   "scripts": {
     "build": "tsc --build"

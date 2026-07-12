@@ -14,3 +14,4 @@ export {
   type Preview,
 } from "./execute.js";
 export { badgeData, renderBadgeSvg, type BadgeData, type BadgeOptions } from "./badge.js";
+export { validateSchema, type SchemaResult } from "./schema.js";

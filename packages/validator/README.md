@@ -12,9 +12,12 @@ npx -p @ai2web/validator ai2web validate ./manifest.json
 # or install globally and run `ai2web`
 npm install -g @ai2web/validator
 ai2web validate https://ai2web.dev
+
+# check probes a LIVE site's declared endpoints (discovery anchor, /ai2w, modules)
+npx -p @ai2web/validator ai2web check https://ai2web.dev
 ```
 
-Output is a per-capability report plus a score line, for example:
+`validate` scores the manifest (design time). `check` discovers the manifest and probes the declared read endpoints to confirm they respond; it lists actions but never calls them, since actions can change state. Output for `validate` is a per-capability report plus a score line, for example:
 
 ```
   AI Readiness Score  96/100   Tier: Standard

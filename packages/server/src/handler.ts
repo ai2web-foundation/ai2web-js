@@ -1,7 +1,7 @@
 // Framework-agnostic AI2Web request handler. Serves the manifest, the well-known
 // anchor, capability negotiation, and dispatches /ai2w/{module} + /ai2w/actions/{name}.
 
-import { negotiate, type Manifest, type AgentSupports } from "@ai2web/core";
+import { negotiate, validateSchema, type Manifest, type AgentSupports } from "@ai2web/core";
 
 export interface Ai2wRequest {
   method: string;
@@ -24,6 +24,13 @@ export interface Ai2wServerOptions {
   modules?: Record<string, ModuleHandler>;
   /** Handlers for /ai2w/actions/{name}. */
   actions?: Record<string, ModuleHandler>;
+  /**
+   * Validate each action's request body against the `input_schema` it declares in the
+   * manifest, returning a 400 `invalid_request` before the handler runs. Defaults to true,
+   * so schema compliance is enforced per request without wiring your own checks. Set false
+   * to opt out.
+   */
+  validateInput?: boolean;
 }
 
 const CORS = {
@@ -42,7 +49,8 @@ const error = (status: number, code: string, message: string, retryable = false)
   json(status, { error: { code, message, retryable } });
 
 export function createAi2wHandler(opts: Ai2wServerOptions) {
-  const { manifest, modules = {}, actions = {} } = opts;
+  const { manifest, modules = {}, actions = {}, validateInput = true } = opts;
+  const declaredActions = new Map((manifest.actions ?? []).map((a) => [a.name, a]));
 
   return async function handle(req: Ai2wRequest): Promise<Ai2wResponse> {
     const path = req.path.replace(/\/+$/, "") || "/";
@@ -75,6 +83,14 @@ export function createAi2wHandler(opts: Ai2wServerOptions) {
       const name = actionMatch[1].replace(/-/g, "_");
       const fn = actions[name];
       if (!fn) return error(404, "unsupported_capability", `Unknown action '${name}'.`);
+      // Enforce the action's declared input_schema on the incoming body (spec §12).
+      const declared = declaredActions.get(name);
+      if (validateInput && declared?.input_schema) {
+        const result = validateSchema(req.body ?? {}, declared.input_schema);
+        if (!result.valid) {
+          return error(400, "invalid_request", `Request does not match the declared input schema: ${result.errors.join("; ")}.`);
+        }
+      }
       return json(200, await fn(req));
     }
 

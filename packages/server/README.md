@@ -32,4 +32,10 @@ createServer(nodeListener(options)).listen(8787);
 export default cloudflareHandler(options);
 ```
 
-`createAi2wHandler(options)` is also exported for use with any other runtime. Part of [AI2Web](https://github.com/ai2web-foundation).
+`createAi2wHandler(options)` is also exported for use with any other runtime.
+
+### Request validation
+
+By default the server validates each action's request body against the `input_schema` that action declares in the manifest, returning a `400 invalid_request` before your handler runs. So schema compliance on every request is built in, not something you wire yourself. Opt out with `validateInput: false` in the options.
+
+Part of [AI2Web](https://github.com/ai2web-foundation).

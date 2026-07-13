@@ -1,5 +1,8 @@
 # AI2Web JavaScript/TypeScript framework (`@ai2web/*`)
 
+[![CI](https://github.com/ai2web-foundation/ai2web-js/actions/workflows/ci.yml/badge.svg)](https://github.com/ai2web-foundation/ai2web-js/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/@ai2web/core?label=%40ai2web%2Fcore)](https://www.npmjs.com/package/@ai2web/core)
+
 The reference framework for the [AI2Web protocol](https://github.com/ai2web-foundation/ai2web-spec). Describe your website's capabilities once; generate the manifest, routes, and adapters.
 
 **TypeScript, JavaScript, or React.** The packages are authored in TypeScript but published as standard ESM JavaScript with bundled type declarations, so they run unchanged in plain JS. `@ai2web/react` adds hooks and an embeddable badge for React apps, and a framework-free `<ai2w-badge>` web component works in any HTML page with no build step. See [`examples/`](examples/).

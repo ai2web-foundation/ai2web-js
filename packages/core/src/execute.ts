@@ -40,9 +40,11 @@ export interface Preview {
   proposed: unknown;
 }
 
-/** RFC-0006 §3.3 / RFC-0003 §4.4: preview iff approval is required OR risk is `high`. */
+/** RFC-0006 §3.3 / RFC-0003 §4.4 / RFC-0014: preview iff approval is required OR risk is
+ * `high` or `critical`. The high/critical rule holds even if the manifest declares
+ * `requires_user_approval: false`, defending against an under-declared destructive action. */
 export function needsApproval(op: { requires_user_approval: boolean; risk: Risk }): boolean {
-  return op.requires_user_approval || op.risk === "high";
+  return op.requires_user_approval || op.risk === "high" || op.risk === "critical";
 }
 
 export function isPreview(x: unknown): x is Preview {

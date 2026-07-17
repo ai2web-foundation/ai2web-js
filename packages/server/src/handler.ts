@@ -1,7 +1,7 @@
 // Framework-agnostic AI2Web request handler. Serves the manifest, the well-known
 // anchor, capability negotiation, and dispatches /ai2w/{module} + /ai2w/actions/{name}.
 
-import { negotiate, validateSchema, type Manifest, type AgentSupports } from "@ai2web/core";
+import { negotiate, validateSchema, toLlmsTxt, toAgentJson, type Manifest, type AgentSupports } from "@ai2web/core";
 
 export interface Ai2wRequest {
   method: string;
@@ -14,6 +14,8 @@ export interface Ai2wResponse {
   status: number;
   headers: Record<string, string>;
   body: unknown;
+  /** When true, `body` is a string to send verbatim (e.g. llms.txt), not JSON-serialized. */
+  raw?: boolean;
 }
 
 export type ModuleHandler = (req: Ai2wRequest) => unknown | Promise<unknown>;
@@ -48,6 +50,13 @@ const json = (status: number, body: unknown): Ai2wResponse => ({
 const error = (status: number, code: string, message: string, retryable = false): Ai2wResponse =>
   json(status, { error: { code, message, retryable } });
 
+const text = (status: number, contentType: string, body: string): Ai2wResponse => ({
+  status,
+  headers: { "content-type": contentType, ...CORS },
+  raw: true,
+  body,
+});
+
 export function createAi2wHandler(opts: Ai2wServerOptions) {
   const { manifest, modules = {}, actions = {}, validateInput = true } = opts;
   const declaredActions = new Map((manifest.actions ?? []).map((a) => [a.name, a]));
@@ -68,6 +77,17 @@ export function createAi2wHandler(opts: Ai2wServerOptions) {
     if (path === "/ai2w" || path === "/ai" || path === "/.ai") {
       if (method !== "GET") return error(405, "invalid_request", "Use GET for the manifest.");
       return json(200, manifest);
+    }
+
+    // Multi-surface projections (RFC-0015): the one canonical manifest, emitted in other
+    // discovery formats so agents that speak llms.txt or agent.json need not parse ai2w first.
+    if (path === "/llms.txt") {
+      if (method !== "GET") return error(405, "invalid_request", "Use GET for llms.txt.");
+      return text(200, "text/plain; charset=utf-8", toLlmsTxt(manifest));
+    }
+    if (path === "/.well-known/agent.json" || path === "/agent.json") {
+      if (method !== "GET") return error(405, "invalid_request", "Use GET for agent.json.");
+      return json(200, toAgentJson(manifest));
     }
 
     // Capability negotiation (spec §5).

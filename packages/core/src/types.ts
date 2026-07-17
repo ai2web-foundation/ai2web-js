@@ -1,6 +1,6 @@
-// AI2Web (ai2w) capability model - TypeScript types. Mirrors ai2web-spec/spec/ai2w-v0.1.md.
+// AI2Web (ai2w) capability model - TypeScript types. Mirrors the ai2web spec.
 
-export type Risk = "low" | "medium" | "high";
+export type Risk = "low" | "medium" | "high" | "critical";
 
 export interface Site {
   name: string;
@@ -12,11 +12,21 @@ export interface Site {
   logo?: string;
 }
 
+/** Agent-identity requirement + verification (RFC-0013). Design-first; verification reuses
+ * HTTP Message Signatures (RFC 9421). Defaults keep anonymous access, so existing sites are unaffected. */
+export interface AgentIdentity {
+  required?: boolean;
+  allow_anonymous?: boolean;
+  methods?: ("http_message_signatures" | "oauth_client" | "attestation")[];
+  min_level?: "anonymous" | "identified" | "verified";
+}
+
 export interface Identity {
   legal_name?: string;
   privacy_policy?: string;
   terms?: string;
   support_url?: string;
+  agent?: AgentIdentity;
 }
 
 export interface CapabilityObject {
@@ -67,6 +77,15 @@ export interface Consent {
   requires_user_approval_for?: string[];
 }
 
+/** How an action can be invoked (RFC-0014). An agent prefers the lowest `priority` it can use;
+ * a `fallback_only` binding (e.g. redirect/html) is used only when nothing else is usable. */
+export interface Binding {
+  kind: "rest" | "mcp" | "openapi" | "graphql" | "redirect" | "html";
+  ref: string;
+  priority?: number;
+  fallback_only?: boolean;
+}
+
 export interface Action {
   name: string;
   description: string;
@@ -77,6 +96,10 @@ export interface Action {
   risk: Risk;
   input_schema: Record<string, unknown>;
   output_schema?: Record<string, unknown>;
+  /** Semantic identifier for the action's purpose (RFC-0014), e.g. "track_delivery". */
+  intent?: string;
+  /** Multiple ways to invoke this action, with priority + fallback (RFC-0014). */
+  bindings?: Binding[];
 }
 
 export interface Events {
@@ -92,6 +115,44 @@ export interface AgentService {
   supported_intents?: string[];
 }
 
+export interface RateLimit { requests: number; window_seconds: number; }
+
+/** Enforced operational governance (RFC-0012). The manifest declares it; a conforming server enforces it. */
+export interface Governance {
+  rate_limits?: RateLimit & { per_action?: Record<string, RateLimit> };
+  data_scope?: Record<string, string[]>;
+  consent_mode?: Record<string, "none" | "preview" | "explicit" | "authenticated">;
+  audit?: Record<string, string[]>;
+}
+
+/** Declarative acceptable-use signals (RFC-0012). Advisory; enforcement is out of band. */
+export interface UsagePolicy {
+  bulk_extraction?: boolean;
+  price_monitoring?: boolean;
+  content_reproduction?: boolean;
+  model_training?: boolean;
+}
+
+/** Declarative legal/transparency metadata (RFC-0012). Aids to transparency, not compliance. */
+export interface Legal {
+  terms_url?: string;
+  privacy_url?: string;
+  jurisdiction?: string;
+  ai_transparency?: boolean;
+  ai_risk_classification?: "minimal" | "limited" | "high";
+  data_processing_basis?: string;
+  restricted_uses?: string[];
+}
+
+/** A trusted content/data source for grounding (RFC-0014). Advisory, read-only. */
+export interface KnowledgeSource {
+  id: string;
+  name?: string;
+  kind: "catalog" | "policy" | "faq" | "feed" | "index";
+  ref: string;
+  format?: string;
+}
+
 export interface Manifest {
   protocol: "ai2w";
   version: string;
@@ -105,6 +166,10 @@ export interface Manifest {
   events?: Events;
   agent_service?: AgentService;
   rate_limits?: Record<string, unknown>;
+  governance?: Governance;
+  usage_policy?: UsagePolicy;
+  legal?: Legal;
+  knowledge?: KnowledgeSource[];
   contact?: { support?: string; security?: string };
   [ext: string]: unknown; // x-* extensions
 }

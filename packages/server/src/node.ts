@@ -27,7 +27,7 @@ export function nodeListener(opts: Ai2wServerOptions) {
     const origin = `${url.protocol}//${url.host}`;
     const out = await handle({ method: req.method ?? "GET", path: url.pathname, body, origin });
     res.writeHead(out.status, out.headers);
-    res.end(out.body === null ? "" : JSON.stringify(out.body));
+    res.end(out.body === null ? "" : out.raw ? String(out.body) : JSON.stringify(out.body));
   };
 }
 

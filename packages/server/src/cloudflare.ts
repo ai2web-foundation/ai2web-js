@@ -19,10 +19,8 @@ export function cloudflareHandler(opts: Ai2wServerOptions): { fetch(request: Req
         body = text ? safeJson(text) : undefined;
       }
       const res = await handle({ method: request.method, path: url.pathname, body, origin: url.origin });
-      return new Response(res.body === null ? "" : JSON.stringify(res.body), {
-        status: res.status,
-        headers: res.headers,
-      });
+      const out = res.body === null ? "" : res.raw ? String(res.body) : JSON.stringify(res.body);
+      return new Response(out, { status: res.status, headers: res.headers });
     },
   };
 }

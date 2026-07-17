@@ -1,12 +1,15 @@
 // Fluent manifest builder - the "describe your website once" developer surface.
 
-import type { Manifest, Site, Capabilities, Action, Events, Auth, Consent, Transports, AgentService } from "./types.js";
+import type {
+  Manifest, Site, Capabilities, Action, Events, Auth, Consent, Transports, AgentService,
+  Governance, UsagePolicy, Legal, AgentIdentity, KnowledgeSource,
+} from "./types.js";
 
 export class Ai2wBuilder {
   private m: Manifest;
 
   constructor(site: Site) {
-    this.m = { protocol: "ai2w", version: "0.1", site, capabilities: {} };
+    this.m = { protocol: "ai2w", version: "0.2", site, capabilities: {} };
   }
 
   capability(name: keyof Capabilities | string, value: boolean | Record<string, unknown> = true): this {
@@ -22,6 +25,14 @@ export class Ai2wBuilder {
   agentService(s: AgentService): this { this.m.agent_service = s; return this; }
   identity(i: Manifest["identity"]): this { this.m.identity = i; return this; }
   contact(c: Manifest["contact"]): this { this.m.contact = c; return this; }
+
+  // v0.2 optional modules (all additive; a minimal manifest stays valid without them).
+  governance(g: Governance): this { this.m.governance = g; return this; }
+  usagePolicy(u: UsagePolicy): this { this.m.usage_policy = u; return this; }
+  legal(l: Legal): this { this.m.legal = l; return this; }
+  agentIdentity(a: AgentIdentity): this { this.m.identity = { ...this.m.identity, agent: a }; return this; }
+  knowledge(k: KnowledgeSource[]): this { this.m.knowledge = k; return this; }
+
   extend(key: `x-${string}`, value: unknown): this { this.m[key] = value; return this; }
 
   build(): Manifest { return this.m; }

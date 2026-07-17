@@ -21,8 +21,6 @@ jobs:
         run: node --experimental-strip-types scripts/adapter-openapi.ts
       - name: Agentic support flow (RFC-0007)
         run: node --experimental-strip-types scripts/support-flow.ts
-      - name: Multi-surface serving (RFC-0015 - llms.txt + agent.json)
-        run: node --experimental-strip-types scripts/test-server.ts
       - name: Validator on fixtures
         run: for f in test/fixtures/*.json; do node scripts/validate.mjs "$f"; done
   build:
@@ -34,3 +32,7 @@ jobs:
         with: { node-version: 22 }
       - run: npm install
       - run: npm run build
+      # Runs here (not in verify) because it imports the server handler, which resolves
+      # the bare "@ai2web/core" package specifier - available only after install + build.
+      - name: Multi-surface serving (RFC-0015 - llms.txt + agent.json)
+        run: node --experimental-strip-types scripts/test-server.ts

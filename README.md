@@ -20,9 +20,9 @@ The reference framework for the [AI2Web protocol](https://github.com/ai2web-foun
 
 | Package | Status | Purpose |
 |---|---|---|
-| `@ai2web/core` | ✅ scaffolded | Types, capability model, fluent manifest **builder**, **validation** + AI Readiness scoring, **discovery** client, and the shared **`executeOperation`** guard (RFC-0006 §3: approval by risk tier, same-origin credentials, SSRF) that every adapter routes through. |
+| `@ai2web/core` | ✅ scaffolded | Types, capability model, fluent manifest **builder**, **validation** + AI Readiness scoring, **discovery** client, **export** projections (`toLlmsTxt` / `toAgentJson`, RFC-0015), and the shared **`executeOperation`** guard (RFC-0006 §3: approval by risk tier, same-origin credentials, SSRF) that every adapter routes through. |
 | `@ai2web/validator` | ✅ scaffolded | `ai2web validate <url>` CLI → per-capability report + AI Readiness Score + tier. |
-| `@ai2web/server` | ⏳ planned | `/ai2w` + `/ai2w/*` route handler; Express/Hono/Fastify/Next adapters. |
+| `@ai2web/server` | ✅ scaffolded | Framework-agnostic `/ai2w`, `/ai2w/*`, negotiation and action route handler, plus multi-surface projections (`/llms.txt`, `/.well-known/agent.json`, RFC-0015); **Cloudflare Workers** and **Node** adapters. |
 | `@ai2web/mcp-bridge` | ✅ scaffolded | Expose declared capabilities as an MCP server (usable in Claude/ChatGPT today). |
 | `@ai2web/graphql-adapter` | ✅ scaffolded | Project the declared model as a GraphQL schema (SDL + resolvers); GET actions become Query fields, writes become Mutations. |
 | `@ai2web/acp-adapter` | ✅ scaffolded | Drive a site's advertised **ACP** checkout transport (RFC-0005 Profile 1); the payment step stays approval-gated. |

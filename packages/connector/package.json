@@ -1,6 +1,6 @@
 {
   "name": "@ai2web/connector",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "keywords": ["ai2web","mcp","connector","ai-agents","claude","chatgpt","discovery","agentic"],
   "description": "Agent-side AI2Web connector - an MCP server that fronts the Discovery Network so Claude/ChatGPT can find AI-ready sites and act on them.",
   "license": "MIT",
@@ -20,8 +20,8 @@
   "files": ["dist"],
   "publishConfig": { "access": "public" },
   "dependencies": {
-    "@ai2web/core": "0.2.0",
-    "@ai2web/mcp-bridge": "0.2.0"
+    "@ai2web/core": "0.3.0",
+    "@ai2web/mcp-bridge": "0.3.0"
   },
   "peerDependencies": {
     "@modelcontextprotocol/sdk": ">=1.0.0"

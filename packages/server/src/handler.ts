@@ -8,6 +8,27 @@ export interface Ai2wRequest {
   path: string;
   body?: unknown;
   origin?: string; // e.g. https://example.com - used to build the well-known pointer
+  /** Coarse agent identity (RFC-0013), if the adapter can supply one from a header. */
+  agent?: string;
+}
+
+/**
+ * A server-side interaction event (RFC-0016). Personal-data-free by default: no names, no full
+ * order/message contents, no end-user identifiers beyond the opaque `audit_ref`. A `query` whose
+ * `result` is `miss` is first-class - aggregated misses quantify demand a site could not meet.
+ */
+export interface Ai2wEvent {
+  ts: string; // ISO timestamp
+  type: "discovery" | "query" | "action" | "outcome";
+  capability?: string; // for discovery/query (the module)
+  name?: string; // action name
+  intent?: string; // RFC-0014
+  filters?: Record<string, string | number | boolean>; // sanitised, non-identifying query params
+  result: "hit" | "miss" | "count" | "success" | "error";
+  audit_ref?: string; // links a state-changing action to a transaction (RFC-0003)
+  agent?: string;
+  latency?: number; // ms
+  error?: string;
 }
 
 export interface Ai2wResponse {
@@ -41,6 +62,12 @@ export interface Ai2wServerOptions {
    * override the URL/endpoint (e.g. a private directory).
    */
   announce?: boolean | { url?: string; endpoint?: string; fetchImpl?: typeof fetch };
+  /**
+   * Analytics sink (RFC-0016). Called with one personal-data-free event per meaningful interaction
+   * (discovery / query / action). Fired non-blocking, so a slow or failing sink never delays the
+   * response. Local-first by default: store events in your own system, or use `analyticsEngineSink`.
+   */
+  onEvent?: (event: Ai2wEvent) => void | Promise<void>;
 }
 
 const DIRECTORY_REGISTER = "https://directory.ai2web.dev/register";
@@ -68,6 +95,47 @@ export async function announceToDirectory(
   } catch {
     return false;
   }
+}
+
+// Keep only non-identifying scalar params (RFC-0016 §3.3): drop long keys/values, emails and
+// long digit runs (phone/card/order ids), objects, and cap the count.
+function sanitizeFilters(body: unknown): Record<string, string | number | boolean> | undefined {
+  if (!body || typeof body !== "object" || Array.isArray(body)) return undefined;
+  const out: Record<string, string | number | boolean> = {};
+  for (const [k, v] of Object.entries(body as Record<string, unknown>)) {
+    if (k.length > 24 || Object.keys(out).length >= 8) break;
+    if (typeof v === "number" || typeof v === "boolean") out[k] = v;
+    else if (typeof v === "string" && v.length <= 40 && !/@|\d{6,}/.test(v)) out[k] = v;
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
+// A query "miss" (empty result) is the demand signal a read-only crawl can't produce.
+function isEmptyResult(x: unknown): boolean {
+  if (Array.isArray(x)) return x.length === 0;
+  if (x && typeof x === "object") {
+    const o = x as { results?: unknown; count?: unknown; items?: unknown };
+    if (Array.isArray(o.results)) return o.results.length === 0;
+    if (Array.isArray(o.items)) return o.items.length === 0;
+    if (typeof o.count === "number") return o.count === 0;
+  }
+  return false;
+}
+
+/**
+ * onEvent sink that writes each event to a Cloudflare Analytics Engine dataset (no PII, SQL-queryable).
+ * Bind an `analytics_engine_datasets` binding in wrangler and pass it here.
+ */
+export function analyticsEngineSink(dataset: { writeDataPoint: (o: { blobs?: (string | null)[]; doubles?: number[]; indexes?: string[] }) => void }) {
+  return (e: Ai2wEvent): void => {
+    try {
+      dataset.writeDataPoint({
+        blobs: [e.type, e.capability ?? e.name ?? "", e.result, e.agent ?? "", e.intent ?? "", e.error ?? "", e.audit_ref ?? ""],
+        doubles: [e.latency ?? 0],
+        indexes: [e.capability ?? e.name ?? e.type],
+      });
+    } catch { /* never let telemetry break a request */ }
+  };
 }
 
 const CORS = {
@@ -106,15 +174,24 @@ export function createAi2wHandler(opts: Ai2wServerOptions) {
     void announceToDirectory(url, { endpoint: a.endpoint, fetchImpl: a.fetchImpl }); // best-effort, non-blocking
   }
 
+  // Fire one analytics event (RFC-0016), non-blocking, never throwing into the request path.
+  function emit(req: Ai2wRequest, start: number, e: Omit<Ai2wEvent, "ts" | "agent" | "latency">): void {
+    if (!opts.onEvent) return;
+    const event: Ai2wEvent = { ts: new Date().toISOString(), agent: req.agent, latency: Date.now() - start, ...e };
+    try { void Promise.resolve(opts.onEvent(event)).catch(() => {}); } catch { /* sink errors never surface */ }
+  }
+
   return async function handle(req: Ai2wRequest): Promise<Ai2wResponse> {
     const path = req.path.replace(/\/+$/, "") || "/";
     const method = req.method.toUpperCase();
+    const start = Date.now();
 
     if (method === "OPTIONS") return { status: 204, headers: CORS, body: null };
 
     // Discovery anchor → pointer to /ai2w (spec §2).
     if (path === "/.well-known/ai2w") {
       maybeAnnounce(req);
+      emit(req, start, { type: "discovery", result: "hit" });
       const home = `${(req.origin ?? "").replace(/\/+$/, "")}/ai2w`;
       return json(200, req.origin ? { ai2w: home } : manifest);
     }
@@ -123,6 +200,7 @@ export function createAi2wHandler(opts: Ai2wServerOptions) {
     if (path === "/ai2w" || path === "/ai" || path === "/.ai") {
       if (method !== "GET") return error(405, "invalid_request", "Use GET for the manifest.");
       maybeAnnounce(req);
+      emit(req, start, { type: "discovery", result: "hit" });
       return json(200, manifest);
     }
 
@@ -158,7 +236,14 @@ export function createAi2wHandler(opts: Ai2wServerOptions) {
           return error(400, "invalid_request", `Request does not match the declared input schema: ${result.errors.join("; ")}.`);
         }
       }
-      return json(200, await fn(req));
+      try {
+        const out = await fn(req);
+        emit(req, start, { type: "action", name, result: "success", audit_ref: (out as { audit_ref?: string } | null)?.audit_ref });
+        return json(200, out);
+      } catch (err) {
+        emit(req, start, { type: "action", name, result: "error", error: (err as Error)?.message?.slice(0, 120) });
+        throw err;
+      }
     }
 
     // Module dispatch: /ai2w/{module}
@@ -167,7 +252,10 @@ export function createAi2wHandler(opts: Ai2wServerOptions) {
       const name = moduleMatch[1];
       const fn = modules[name];
       if (!fn) return error(404, "unsupported_capability", `Module '${name}' not exposed.`);
-      return json(200, await fn(req));
+      const out = await fn(req);
+      // A query "miss" (empty result) is a first-class demand signal (RFC-0016 §3.4).
+      emit(req, start, { type: "query", capability: name, result: isEmptyResult(out) ? "miss" : "count", filters: sanitizeFilters(req.body) });
+      return json(200, out);
     }
 
     return error(404, "invalid_request", `No AI2Web route for ${path}.`);

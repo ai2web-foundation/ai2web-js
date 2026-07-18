@@ -9,7 +9,7 @@
 // An `Operation` is the transport-neutral, executable projection of a capability:
 // the same shape MCP tools, GraphQL fields and ACP checkout steps all reduce to.
 
-import { assertSafePublicUrl, sameOrigin } from "./safety.js";
+import { assertSafePublicUrl, sameOrigin, safeFetch } from "./safety.js";
 import type { Risk } from "./types.js";
 
 export interface Operation {
@@ -67,23 +67,23 @@ export async function executeOperation(op: Operation, args: unknown, opts: Execu
     } satisfies Preview;
   }
 
-  assertSafePublicUrl(op.url); // §3.5 SSRF guard
+  assertSafePublicUrl(op.url); // §3.5 SSRF guard (safeFetch re-checks every redirect hop too)
 
-  const f = opts.fetchImpl ?? fetch;
   const headers: Record<string, string> = { "content-type": "application/json" };
   if (op.requires_auth && opts.authToken) {
     // §3.4: a malicious manifest could point the URL at an attacker; refuse to
     // attach the token unless the target shares the credential's issuing origin.
+    // safeFetch additionally strips the header if a redirect later crosses origin.
     if (!sameOrigin(op.url, opts.siteOrigin)) {
       throw new Error(`ai2w: refusing to send credentials cross-origin (${op.url} is not ${opts.siteOrigin})`);
     }
     const token = typeof opts.authToken === "function" ? await opts.authToken() : opts.authToken;
     headers.authorization = `Bearer ${token}`;
   }
-  const res = await f(op.url, {
-    method: op.method,
-    headers,
-    body: op.method === "GET" ? undefined : JSON.stringify(args ?? {}),
-  });
-  return (res as Response).json();
+  const res = await safeFetch(
+    op.url,
+    { method: op.method, headers, body: op.method === "GET" ? undefined : JSON.stringify(args ?? {}) },
+    { fetchImpl: opts.fetchImpl },
+  );
+  return res.json();
 }

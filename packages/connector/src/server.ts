@@ -1,7 +1,7 @@
 // MCP server that fronts the Discovery Network. Load this as a custom connector in
 // Claude / a ChatGPT App; it gives the assistant three tools to work the whole network.
 
-import { assertSafePublicUrl } from "@ai2web/core";
+import { safeFetch } from "@ai2web/core";
 import { httpDirectory, findSites, describeSite, planForAgent, type DirectoryClient } from "./connector.js";
 
 export interface ConnectorOptions {
@@ -60,8 +60,8 @@ export async function createConnectorServer(opts: ConnectorOptions = {}) {
       if (tool.invoke.requires_user_approval || tool.invoke.risk === "high") {
         return { content: [{ type: "text", text: JSON.stringify({ preview: true, action: tool.name, risk: tool.invoke.risk, proposed: args.input }) }] };
       }
-      assertSafePublicUrl(tool.invoke.url); // SSRF guard
-      const res = await fetch(tool.invoke.url, {
+      // safeFetch guards the target and re-validates every redirect hop (SSRF).
+      const res = await safeFetch(tool.invoke.url, {
         method: tool.invoke.method,
         headers: { "content-type": "application/json" },
         body: tool.invoke.method === "GET" ? undefined : JSON.stringify(args.input ?? {}),

@@ -1,6 +1,6 @@
 {
   "name": "@ai2web/openapi-adapter",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "keywords": ["ai2web","openapi","swagger","ai-agents","api","adapter"],
   "description": "Describe an AI2Web site's declared actions as an OpenAPI 3.1 document, preserving auth and risk/approval semantics.",
   "license": "MIT",
@@ -17,7 +17,7 @@
   "files": ["dist"],
   "publishConfig": { "access": "public" },
   "dependencies": {
-    "@ai2web/core": "0.3.0"
+    "@ai2web/core": "0.4.0"
   },
   "scripts": {
     "build": "tsc --build"

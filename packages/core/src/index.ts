@@ -4,7 +4,8 @@ export { validateManifest } from "./validate.js";
 export { Ai2wBuilder, ai2web } from "./builder.js";
 export { discover, type DiscoverResult } from "./discover.js";
 export { negotiate, type AgentSupports, type Negotiated, type NegotiationResult } from "./negotiate.js";
-export { isSafePublicUrl, assertSafePublicUrl, sameOrigin } from "./safety.js";
+export { isSafePublicUrl, assertSafePublicUrl, safeFetch, sameOrigin } from "./safety.js";
+export type { SafeFetchOptions } from "./safety.js";
 export {
   executeOperation,
   needsApproval,

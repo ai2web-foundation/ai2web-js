@@ -33,6 +33,41 @@ export interface Ai2wServerOptions {
    * to opt out.
    */
   validateInput?: boolean;
+  /**
+   * Auto-discovery (opt-in): announce this site to the AI2Web Discovery Network the first time
+   * it serves its manifest, so agents can find it via the connector without a manual submission.
+   * Best-effort and non-blocking; only the site URL is sent - the directory re-fetches and
+   * verifies the live manifest server-side. `true` uses the public directory; pass an object to
+   * override the URL/endpoint (e.g. a private directory).
+   */
+  announce?: boolean | { url?: string; endpoint?: string; fetchImpl?: typeof fetch };
+}
+
+const DIRECTORY_REGISTER = "https://directory.ai2web.dev/register";
+const _announced = new Set<string>();
+
+/**
+ * Announce a site to the AI2Web Discovery Network. Sends only the origin; the directory
+ * re-fetches and verifies the live `/.well-known/ai2w` before listing. Returns whether the
+ * directory accepted it. Safe to call on deploy/startup, ideally inside `ctx.waitUntil`.
+ */
+export async function announceToDirectory(
+  siteUrl: string,
+  opts: { endpoint?: string; fetchImpl?: typeof fetch } = {},
+): Promise<boolean> {
+  const doFetch = opts.fetchImpl ?? fetch;
+  try {
+    const u = new URL(siteUrl);
+    if (u.protocol !== "https:") return false; // the directory only accepts public https origins
+    const res = await doFetch(opts.endpoint ?? DIRECTORY_REGISTER, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ url: u.origin }),
+    });
+    return (res as Response).ok;
+  } catch {
+    return false;
+  }
 }
 
 const CORS = {
@@ -61,6 +96,16 @@ export function createAi2wHandler(opts: Ai2wServerOptions) {
   const { manifest, modules = {}, actions = {}, validateInput = true } = opts;
   const declaredActions = new Map((manifest.actions ?? []).map((a) => [a.name, a]));
 
+  // Auto-discovery: on the first discovery serve, announce this origin once per process.
+  function maybeAnnounce(req: Ai2wRequest): void {
+    if (!opts.announce) return;
+    const a = opts.announce === true ? {} : opts.announce;
+    const url = a.url ?? req.origin ?? (manifest.site as { url?: string } | undefined)?.url;
+    if (!url || _announced.has(url)) return;
+    _announced.add(url);
+    void announceToDirectory(url, { endpoint: a.endpoint, fetchImpl: a.fetchImpl }); // best-effort, non-blocking
+  }
+
   return async function handle(req: Ai2wRequest): Promise<Ai2wResponse> {
     const path = req.path.replace(/\/+$/, "") || "/";
     const method = req.method.toUpperCase();
@@ -69,6 +114,7 @@ export function createAi2wHandler(opts: Ai2wServerOptions) {
 
     // Discovery anchor → pointer to /ai2w (spec §2).
     if (path === "/.well-known/ai2w") {
+      maybeAnnounce(req);
       const home = `${(req.origin ?? "").replace(/\/+$/, "")}/ai2w`;
       return json(200, req.origin ? { ai2w: home } : manifest);
     }
@@ -76,6 +122,7 @@ export function createAi2wHandler(opts: Ai2wServerOptions) {
     // Canonical manifest home + friendly alias.
     if (path === "/ai2w" || path === "/ai" || path === "/.ai") {
       if (method !== "GET") return error(405, "invalid_request", "Use GET for the manifest.");
+      maybeAnnounce(req);
       return json(200, manifest);
     }
 

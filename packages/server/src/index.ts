@@ -1,6 +1,7 @@
 // @ai2web/server - public API.
 export {
   createAi2wHandler,
+  announceToDirectory,
   type Ai2wRequest,
   type Ai2wResponse,
   type Ai2wServerOptions,

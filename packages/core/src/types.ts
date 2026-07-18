@@ -100,6 +100,15 @@ export interface Action {
   intent?: string;
   /** Multiple ways to invoke this action, with priority + fallback (RFC-0014). */
   bindings?: Binding[];
+  /** Deprecation marker (RFC-0011); a conforming server emits Deprecation/Sunset headers. */
+  deprecated?: Deprecated;
+}
+
+/** Deprecation marker (RFC-0011), surfaced as RFC 8594 Deprecation/Sunset HTTP headers. */
+export interface Deprecated {
+  since?: string;       // ISO date the item was deprecated
+  sunset?: string;      // ISO date after which it may stop working
+  replacement?: string; // URL/id of the successor
 }
 
 export interface Events {
@@ -171,6 +180,8 @@ export interface Manifest {
   legal?: Legal;
   knowledge?: KnowledgeSource[];
   contact?: { support?: string; security?: string };
+  /** Whole-manifest deprecation marker (RFC-0011). */
+  deprecated?: Deprecated;
   [ext: string]: unknown; // x-* extensions
 }
 

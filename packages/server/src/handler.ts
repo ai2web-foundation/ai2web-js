@@ -1,7 +1,22 @@
 // Framework-agnostic AI2Web request handler. Serves the manifest, the well-known
 // anchor, capability negotiation, and dispatches /ai2w/{module} + /ai2w/actions/{name}.
 
-import { negotiate, validateSchema, toLlmsTxt, toAgentJson, type Manifest, type AgentSupports } from "@ai2web/core";
+import { negotiate, validateSchema, toLlmsTxt, toAgentJson, type Manifest, type AgentSupports, type Deprecated } from "@ai2web/core";
+
+/** Fresh audit reference for a state-changing action (RFC-0003/§0009). Opaque, no PII. */
+function newAuditRef(): string {
+  const rnd = globalThis.crypto?.randomUUID?.().replace(/-/g, "") ?? Math.random().toString(36).slice(2) + Date.now().toString(36);
+  return "aud_" + rnd.slice(0, 24);
+}
+
+/** RFC 8594 Deprecation/Sunset headers from an RFC-0011 marker. */
+function deprecationHeaders(d?: Deprecated): Record<string, string> {
+  if (!d) return {};
+  const h: Record<string, string> = { Deprecation: d.since ?? "true" };
+  if (d.sunset) { const t = new Date(d.sunset); h.Sunset = isNaN(t.getTime()) ? d.sunset : t.toUTCString(); }
+  if (d.replacement) h.Link = `<${d.replacement}>; rel="successor-version"`;
+  return h;
+}
 
 export interface Ai2wRequest {
   method: string;
@@ -10,6 +25,8 @@ export interface Ai2wRequest {
   origin?: string; // e.g. https://example.com - used to build the well-known pointer
   /** Coarse agent identity (RFC-0013), if the adapter can supply one from a header. */
   agent?: string;
+  /** Audit reference for a state-changing action; set by the handler and passed to the action fn. */
+  audit_ref?: string;
 }
 
 /**
@@ -201,7 +218,9 @@ export function createAi2wHandler(opts: Ai2wServerOptions) {
       if (method !== "GET") return error(405, "invalid_request", "Use GET for the manifest.");
       maybeAnnounce(req);
       emit(req, start, { type: "discovery", result: "hit" });
-      return json(200, manifest);
+      const res = json(200, manifest);
+      Object.assign(res.headers, deprecationHeaders(manifest.deprecated)); // RFC-0011
+      return res;
     }
 
     // Multi-surface projections (RFC-0015): the one canonical manifest, emitted in other
@@ -236,10 +255,18 @@ export function createAi2wHandler(opts: Ai2wServerOptions) {
           return error(400, "invalid_request", `Request does not match the declared input schema: ${result.errors.join("; ")}.`);
         }
       }
+      // Mint an audit_ref for state-changing actions (RFC-0003) and hand it to the action fn.
+      const audit_ref = method === "GET" ? undefined : newAuditRef();
       try {
-        const out = await fn(req);
-        emit(req, start, { type: "action", name, result: "success", audit_ref: (out as { audit_ref?: string } | null)?.audit_ref });
-        return json(200, out);
+        const out = await fn({ ...req, audit_ref });
+        const ref = (out as { audit_ref?: string } | null)?.audit_ref ?? audit_ref;
+        // Ensure a state-changing action's response carries its audit_ref, even if the fn omitted it.
+        const body = ref && out && typeof out === "object" && !Array.isArray(out) && !(out as { audit_ref?: string }).audit_ref
+          ? { ...(out as object), audit_ref: ref } : out;
+        emit(req, start, { type: "action", name, result: "success", audit_ref: ref });
+        const res = json(200, body);
+        Object.assign(res.headers, deprecationHeaders(declared?.deprecated)); // RFC-0011
+        return res;
       } catch (err) {
         emit(req, start, { type: "action", name, result: "error", error: (err as Error)?.message?.slice(0, 120) });
         throw err;

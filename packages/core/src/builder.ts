@@ -2,7 +2,7 @@
 
 import type {
   Manifest, Site, Capabilities, Action, Events, Auth, Consent, Transports, AgentService,
-  Governance, UsagePolicy, Legal, AgentIdentity, KnowledgeSource,
+  Governance, UsagePolicy, Legal, AgentIdentity, KnowledgeSource, Deprecated,
 } from "./types.js";
 
 export class Ai2wBuilder {
@@ -32,6 +32,9 @@ export class Ai2wBuilder {
   legal(l: Legal): this { this.m.legal = l; return this; }
   agentIdentity(a: AgentIdentity): this { this.m.identity = { ...this.m.identity, agent: a }; return this; }
   knowledge(k: KnowledgeSource[]): this { this.m.knowledge = k; return this; }
+
+  /** Mark the whole manifest deprecated (RFC-0011); the server emits Deprecation/Sunset headers. */
+  deprecate(d: Deprecated): this { this.m.deprecated = d; return this; }
 
   extend(key: `x-${string}`, value: unknown): this { this.m[key] = value; return this; }
 

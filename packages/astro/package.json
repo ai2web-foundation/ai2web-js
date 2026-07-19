@@ -1,0 +1,32 @@
+{
+  "name": "@ai2web/astro",
+  "version": "0.4.0",
+  "keywords": ["ai2web","astro","astro-integration","ai-agents","agentic","mcp","ssr","endpoints"],
+  "description": "Astro integration that serves all AI2Web routes (/ai2w, /.well-known/ai2w, llms.txt, agent.json, actions) from one manifest.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai2web-foundation/ai2web-js.git",
+    "directory": "packages/astro"
+  },
+  "homepage": "https://ai2web.dev",
+  "bugs": "https://github.com/ai2web-foundation/ai2web-js/issues",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./route": { "types": "./dist/route.d.ts", "default": "./dist/route.js" }
+  },
+  "files": ["dist"],
+  "publishConfig": { "access": "public" },
+  "dependencies": {
+    "@ai2web/server": "0.4.0"
+  },
+  "peerDependencies": {
+    "astro": ">=4"
+  },
+  "scripts": {
+    "build": "tsc --build"
+  }
+}

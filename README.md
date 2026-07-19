@@ -29,6 +29,9 @@ The reference framework for the [AI2Web protocol](https://github.com/ai2web-foun
 | `@ai2web/openapi-adapter` | ✅ scaffolded | Describe the declared actions as an **OpenAPI 3.1** document; auth becomes security, risk/approval become `x-ai2w-*` extensions. |
 | `@ai2web/connector` | ✅ scaffolded | Agent-side connector: one MCP server that fronts the Discovery Network and acts on sites. |
 | `@ai2web/react` | ✅ scaffolded | React bindings: `useDiscover` / `useValidate` / `useNegotiate` hooks and an embeddable `<Ai2wBadge>`. React is an optional peer dependency. |
+| `@ai2web/hono` | ✅ scaffolded | Hono middleware: `app.use("*", ai2w({ manifest, actions }))` serves every AI2Web route and passes the rest through. Edge-native (Workers/Bun/Deno). |
+| `@ai2web/astro` | ✅ scaffolded | Astro integration (auto-wires the routes) + a `createAi2wRoute` endpoint factory. Serves from your manifest under SSR/hybrid output. |
+| `@ai2web/nuxt` | ✅ scaffolded | Nuxt module: add `"@ai2web/nuxt"` and point it at your config module; it registers the Nitro server routes for every AI2Web path. |
 
 The executing adapters (MCP, GraphQL, ACP) derive their surface from the same manifest and run through the one `executeOperation` in `@ai2web/core`, so none can expose an undeclared capability or drift on the security contract; the OpenAPI adapter is descriptive but likewise describes only declared actions and preserves their auth/risk semantics. Conformance is enforced in CI by [`scripts/adapter-conformance.ts`](scripts/adapter-conformance.ts) (MCP), [`scripts/adapter-graphql-acp.ts`](scripts/adapter-graphql-acp.ts) (GraphQL + ACP), and [`scripts/adapter-openapi.ts`](scripts/adapter-openapi.ts) (OpenAPI).
 

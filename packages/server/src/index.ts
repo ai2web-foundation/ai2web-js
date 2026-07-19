@@ -1,6 +1,8 @@
 // @ai2web/server - public API.
 export {
   createAi2wHandler,
+  fetchHandler,
+  isAi2wPath,
   announceToDirectory,
   analyticsEngineSink,
   type Ai2wRequest,

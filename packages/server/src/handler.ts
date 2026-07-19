@@ -177,6 +177,44 @@ const text = (status: number, contentType: string, body: string): Ai2wResponse =
   body,
 });
 
+const AI2W_EXACT = new Set(["/ai2w", "/ai", "/.ai", "/llms.txt", "/agent.json", "/.well-known/ai2w", "/.well-known/agent.json"]);
+
+/**
+ * True for a path AI2Web serves. Lets a framework adapter (Hono, Astro, Nuxt) intercept only
+ * AI2Web routes and pass every other request through to the app.
+ */
+export function isAi2wPath(path: string): boolean {
+  const p = path.replace(/\/+$/, "") || "/";
+  return AI2W_EXACT.has(p) || p.startsWith("/ai2w/");
+}
+
+function safeJson(raw: string): unknown {
+  try { return JSON.parse(raw); } catch { return raw; }
+}
+
+/**
+ * Web-standard adapter: a `(Request) => Promise<Response>` over the AI2Web handler, for any
+ * Fetch-API runtime (Cloudflare Workers, Hono, Astro endpoints, Nuxt/Nitro, Bun, Deno). Parses a
+ * JSON body for POST/PUT/PATCH, derives the origin from the URL, and forwards an `x-ai2w-agent`
+ * header as the coarse agent id (RFC-0013). The shared core behind every framework adapter.
+ */
+export function fetchHandler(opts: Ai2wServerOptions): (request: Request) => Promise<Response> {
+  const handle = createAi2wHandler(opts);
+  return async (request: Request): Promise<Response> => {
+    const url = new URL(request.url);
+    let body: unknown;
+    const method = request.method.toUpperCase();
+    if (method === "POST" || method === "PUT" || method === "PATCH") {
+      const raw = await request.text();
+      body = raw ? safeJson(raw) : undefined;
+    }
+    const agent = request.headers.get("x-ai2w-agent") ?? undefined;
+    const res = await handle({ method: request.method, path: url.pathname, body, origin: url.origin, agent });
+    const out = res.body === null ? "" : res.raw ? String(res.body) : JSON.stringify(res.body);
+    return new Response(out, { status: res.status, headers: res.headers });
+  };
+}
+
 export function createAi2wHandler(opts: Ai2wServerOptions) {
   const { manifest, modules = {}, actions = {}, validateInput = true } = opts;
   const declaredActions = new Map((manifest.actions ?? []).map((a) => [a.name, a]));

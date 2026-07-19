@@ -1,0 +1,31 @@
+{
+  "name": "@ai2web/nuxt",
+  "version": "0.4.0",
+  "keywords": ["ai2web","nuxt","nuxt-module","nitro","vue","ai-agents","agentic","mcp"],
+  "description": "Nuxt module that serves all AI2Web routes (/ai2w, /.well-known/ai2w, llms.txt, agent.json, actions) from one manifest.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai2web-foundation/ai2web-js.git",
+    "directory": "packages/nuxt"
+  },
+  "homepage": "https://ai2web.dev",
+  "bugs": "https://github.com/ai2web-foundation/ai2web-js/issues",
+  "type": "module",
+  "main": "./dist/module.js",
+  "types": "./dist/module.d.ts",
+  "exports": {
+    ".": { "types": "./dist/module.d.ts", "default": "./dist/module.js" }
+  },
+  "files": ["dist"],
+  "publishConfig": { "access": "public" },
+  "dependencies": {
+    "@ai2web/server": "0.4.0"
+  },
+  "peerDependencies": {
+    "nuxt": ">=3"
+  },
+  "scripts": {
+    "build": "tsc --build"
+  }
+}

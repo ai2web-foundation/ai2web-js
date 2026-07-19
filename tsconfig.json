@@ -9,6 +9,9 @@
     { "path": "packages/acp-adapter" },
     { "path": "packages/openapi-adapter" },
     { "path": "packages/react" },
+    { "path": "packages/hono" },
+    { "path": "packages/astro" },
+    { "path": "packages/nuxt" },
     { "path": "packages/connector" }
   ]
 }

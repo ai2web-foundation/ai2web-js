@@ -36,3 +36,5 @@ jobs:
       # the bare "@ai2web/core" package specifier - available only after install + build.
       - name: Multi-surface serving (RFC-0015 - llms.txt + agent.json)
         run: node --experimental-strip-types scripts/test-server.ts
+      - name: Framework adapters (Hono / Astro / Nuxt)
+        run: node --experimental-strip-types scripts/adapter-frameworks.ts

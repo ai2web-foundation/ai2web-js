@@ -1,6 +1,6 @@
 {
   "name": "@ai2web/core",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "keywords": ["ai2web","ai","ai-agents","agentic","mcp","capability-manifest","agent-protocol","llm","discovery","validation"],
   "description": "AI2Web (ai2w) core - types, capability model, manifest builder, validation & AI Readiness scoring.",
   "license": "MIT",

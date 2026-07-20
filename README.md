@@ -26,6 +26,7 @@ The reference framework for the [AI2Web protocol](https://github.com/ai2web-foun
 | `@ai2web/mcp-bridge` | ✅ scaffolded | Expose declared capabilities as an MCP server (usable in Claude/ChatGPT today). |
 | `@ai2web/graphql-adapter` | ✅ scaffolded | Project the declared model as a GraphQL schema (SDL + resolvers); GET actions become Query fields, writes become Mutations. |
 | `@ai2web/acp-adapter` | ✅ scaffolded | Drive a site's advertised **ACP** checkout transport (RFC-0005 Profile 1); the payment step stays approval-gated. |
+| `@ai2web/ap2-adapter` | ✅ scaffolded | Drive a site's advertised **AP2** (Agent Payments Protocol) merchant transport: create a signed Cart Mandate, settle a Payment Mandate; the payment step stays approval-gated. |
 | `@ai2web/openapi-adapter` | ✅ scaffolded | Describe the declared actions as an **OpenAPI 3.1** document; auth becomes security, risk/approval become `x-ai2w-*` extensions. |
 | `@ai2web/connector` | ✅ scaffolded | Agent-side connector: one MCP server that fronts the Discovery Network and acts on sites. |
 | `@ai2web/react` | ✅ scaffolded | React bindings: `useDiscover` / `useValidate` / `useNegotiate` hooks and an embeddable `<Ai2wBadge>`. React is an optional peer dependency. |

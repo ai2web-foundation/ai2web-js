@@ -1,0 +1,25 @@
+{
+  "name": "@ai2web/ap2-adapter",
+  "version": "0.4.1",
+  "keywords": ["ai2web","ap2","agent-payments","agentic-commerce","mandate","checkout","ai-agents","payments"],
+  "description": "Drive an AI2Web site's advertised AP2 (Agent Payments Protocol) merchant transport with approval-gated payment.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai2web-foundation/ai2web-js.git",
+    "directory": "packages/ap2-adapter"
+  },
+  "homepage": "https://ai2web.dev",
+  "bugs": "https://github.com/ai2web-foundation/ai2web-js/issues",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "publishConfig": { "access": "public" },
+  "dependencies": {
+    "@ai2web/core": "0.4.1"
+  },
+  "scripts": {
+    "build": "tsc --build"
+  }
+}

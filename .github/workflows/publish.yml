@@ -24,8 +24,25 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm ci
       - run: npm run build
-      # Publishes all non-private workspaces. Each package.json already sets
-      # publishConfig.access = public, so scoped packages publish publicly.
-      - run: npm publish --workspaces --access public --provenance
+      # Publish only workspaces whose current version is not already on npm. This makes releasing
+      # a newly added package (e.g. @ai2web/ap2-adapter) - or bumping a subset - work without
+      # `npm publish` erroring on packages whose version is already published. Idempotent: safe to
+      # re-run. Each package.json sets publishConfig.access = public.
+      - name: Publish changed workspaces
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          for dir in packages/*/; do
+            [ -f "${dir}package.json" ] || continue
+            if [ "$(node -p "require('./${dir}package.json').private === true")" = "true" ]; then
+              continue
+            fi
+            name=$(node -p "require('./${dir}package.json').name")
+            version=$(node -p "require('./${dir}package.json').version")
+            if npm view "${name}@${version}" version >/dev/null 2>&1; then
+              echo "skip ${name}@${version} (already published)"
+            else
+              echo "publish ${name}@${version}"
+              npm publish -w "${name}" --access public --provenance
+            fi
+          done

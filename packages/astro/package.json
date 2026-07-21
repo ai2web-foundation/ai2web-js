@@ -1,6 +1,6 @@
 {
   "name": "@ai2web/astro",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "keywords": ["ai2web","astro","astro-integration","ai-agents","agentic","mcp","ssr","endpoints"],
   "description": "Astro integration that serves all AI2Web routes (/ai2w, /.well-known/ai2w, llms.txt, agent.json, actions) from one manifest.",
   "license": "MIT",
@@ -21,7 +21,7 @@
   "files": ["dist"],
   "publishConfig": { "access": "public" },
   "dependencies": {
-    "@ai2web/server": "0.4.1"
+    "@ai2web/server": "0.4.2"
   },
   "peerDependencies": {
     "astro": ">=4"

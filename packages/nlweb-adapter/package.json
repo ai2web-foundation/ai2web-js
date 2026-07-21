@@ -1,0 +1,25 @@
+{
+  "name": "@ai2web/nlweb-adapter",
+  "version": "0.4.1",
+  "keywords": ["ai2web","nlweb","ai-agents","agentic-web","mcp","schema-org","search","ai"],
+  "description": "Query an AI2Web site's advertised NLWeb endpoint through the shared guarded executor.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai2web-foundation/ai2web-js.git",
+    "directory": "packages/nlweb-adapter"
+  },
+  "homepage": "https://ai2web.dev",
+  "bugs": "https://github.com/ai2web-foundation/ai2web-js/issues",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "publishConfig": { "access": "public" },
+  "dependencies": {
+    "@ai2web/core": "0.4.1"
+  },
+  "scripts": {
+    "build": "tsc --build"
+  }
+}

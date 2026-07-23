@@ -16,4 +16,11 @@ export {
 } from "./execute.js";
 export { badgeData, renderBadgeSvg, type BadgeData, type BadgeOptions } from "./badge.js";
 export { validateSchema, type SchemaResult } from "./schema.js";
-export { toLlmsTxt, toAgentJson } from "./export.js";
+export {
+  toLlmsTxt,
+  toAgentJson,
+  toOAuthProtectedResource,
+  toContentSignals,
+  toRobotsTxt,
+  toDiscoveryLinkHeader,
+} from "./export.js";

@@ -1,6 +1,6 @@
 {
   "name": "@ai2web/nuxt",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "keywords": ["ai2web","nuxt","nuxt-module","nitro","vue","ai-agents","agentic","mcp"],
   "description": "Nuxt module that serves all AI2Web routes (/ai2w, /.well-known/ai2w, llms.txt, agent.json, actions) from one manifest.",
   "license": "MIT",
@@ -20,7 +20,7 @@
   "files": ["dist"],
   "publishConfig": { "access": "public" },
   "dependencies": {
-    "@ai2web/server": "0.4.2"
+    "@ai2web/server": "0.4.3"
   },
   "peerDependencies": {
     "nuxt": ">=3"
